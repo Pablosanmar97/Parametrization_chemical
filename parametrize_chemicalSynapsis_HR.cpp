@@ -196,8 +196,16 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    double h1_min = std::numeric_limits<double>::max();
+    double h1_max = std::numeric_limits<double>::lowest();
+    double syn_min = std::numeric_limits<double>::max();
+    double syn_max = std::numeric_limits<double>::lowest();
 
-    double accumulated_distance = 0.0;
+    // Option 1: store all values in vectors for second pass
+    std::vector<double> h1_vals;
+    std::vector<double> syn_vals;
+    std::vector<double> times;
+
     // Simulation loop
     for (double time = 0; time < simulation_time; time += step) {
         s.step(step, h1.get(HR::x), h2.get(HR::x));
@@ -208,6 +216,20 @@ int main(int argc, char **argv) {
         h1.step(step);
         h2.step(step);
 
+        double h1_val = h1.get(HR::x);
+        double syn_val = s.get(Synapsis::ifast);
+
+        // store
+        times.push_back(time);
+        h1_vals.push_back(h1_val);
+        syn_vals.push_back(syn_val);
+
+        // update min/max
+        if (h1_val < h1_min) h1_min = h1_val;
+        if (h1_val > h1_max) h1_max = h1_val;
+        if (syn_val < syn_min) syn_min = syn_val;
+        if (syn_val > syn_max) syn_max = syn_val;
+
         out << time << " "
             << h1.get(HR::x) << " "
             << h2.get(HR::x) << " "
@@ -215,8 +237,14 @@ int main(int argc, char **argv) {
             << s.get(Synapsis::ifast) << " "
             << s.get(Synapsis::islow)
             << "\n";
-        // Accumulate distance (scalar Euclidean = abs diff)
-        double distance = std::abs(h1.get(HR::x) - s.get(Synapsis::ifast));
+    }
+
+    double accumulated_distance = 0.0;
+    for (size_t i = 0; i < h1_vals.size(); ++i) {
+        double h1_norm = (h1_vals[i] - h1_min) / (h1_max - h1_min);
+        double syn_norm = (syn_vals[i] - syn_min) / (syn_max - syn_min);
+
+        double distance = std::abs(h1_norm - syn_norm);
         accumulated_distance += distance;
     } 
 

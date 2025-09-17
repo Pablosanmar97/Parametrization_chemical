@@ -3,7 +3,7 @@ import subprocess
 import glob
 
 # Path to your C++ executable
-exe_path = "./parametrize_chemicalSynapsis_HR"
+exe_path = "./parametrize_chemicalSynapsis_PD-HR"
 
 # Folder containing YAML files
 yaml_folder = "yaml_configs"
@@ -11,6 +11,8 @@ yaml_folder = "yaml_configs"
 # Simulation parameters
 simulation_time = 1000.0  # adjust as needed
 step = 0.01                # optional, adjust if needed
+
+csv_file = os.path.abspath("PDtraces.csv")
 
 # Find all YAML files
 yaml_files = glob.glob(os.path.join(yaml_folder, "*.yaml"))
@@ -21,7 +23,7 @@ for yaml_file in yaml_files:
     output_file = os.path.join(yaml_folder, base_name + ".asc")
 
     # Build the command
-    cmd = [exe_path, yaml_file, output_file, str(simulation_time), str(step)]
+    cmd = [exe_path, yaml_file, output_file, str(simulation_time), str(step), csv_file]
 
     # Run the command
     print(f"Running: {' '.join(cmd)}")
@@ -33,3 +35,6 @@ for yaml_file in yaml_files:
         print(result.stdout)
     if result.stderr:
         print(result.stderr)
+
+
+

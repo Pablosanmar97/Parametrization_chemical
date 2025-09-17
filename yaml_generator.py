@@ -17,7 +17,7 @@ base_yaml = {
     },
     "HR2": {
         "e": 3.281,
-        "mu": 0.0029,
+        "mu": 0.0039,
         "S": 4,
         "a": 1,
         "b": 3,
@@ -28,19 +28,19 @@ base_yaml = {
     },
     "Chemical-HR1-HR2": {
         "gfast": 0.015,
-        "Esyn": -75,
+        "Esyn": -1.5,
         "sfast": 0.2,
-        "Vfast": -50,
-        "gslow": 0,
+        "Vfast": -0,
+        "gslow": 0 ,
         "k1": 1,
         "k2": 0.03,
         "sslow": 1
     },
     "Chemical-HR2-HR1": {
         "gfast": 0.015,
-        "Esyn": -75,
+        "Esyn": -1.5,
         "sfast": 0.2,
-        "Vfast": -50,
+        "Vfast": -0,
         "gslow": 0.025,
         "k1": 1,
         "k2": 0.03,
@@ -61,23 +61,29 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
 
     # Define parameter grids for the sweep
-    gfast_values = [0.01, 0.015, 0.02]
-    # gslow_values = [0, 0.005, 0.01]
-    gslow_values = [0]
-    sfast_values = [0.1, 0.2]
-    Vfast_values = [-55, -50]
+    gfast_values = [0.01,0.1]
+    #gslow_values = [0, 0.005, 0.01]
+    gslow_values = [0.01, 0.1]
+    #sfast_values = [0.1, 0.2]
+    #Vfast_values = [-1.5, -2]
+    Esyn_values = [1.5]
+    sfast_values = [20]
+    Vfast_values = [0]
+    sslow_values = [20]
 
     # Generate full grid combinations
-    param_grid = itertools.product(gfast_values, gslow_values, sfast_values, Vfast_values)
+    param_grid = itertools.product(gfast_values, gslow_values, sfast_values, Vfast_values, Esyn_values, sslow_values)
 
-    for i, (gfast, gslow, sfast, Vfast) in enumerate(param_grid, 1):
+    for i, (gfast, gslow, sfast, Vfast, Esyn, sslow) in enumerate(param_grid, 1):
         params = {
             "gfast": gfast,
             "gslow": gslow,
             "sfast": sfast,
-            "Vfast": Vfast
+            "Vfast": Vfast,
+            "Esyn": Esyn,
+            "sslow": sslow
         }
         # Unique filename including parameter values
         filename = os.path.join(output_dir,
-                                f"config_gf{gfast}_gs{gslow}_sf{sfast}_Vf{abs(Vfast)}.yaml")
+                                f"config_gf{gfast}_gs{gslow}_sf{sfast}_Vf{abs(Vfast)}_Es{Esyn}_ss{sslow}.yaml")
         generate_yaml(filename, params)
