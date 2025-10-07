@@ -1,6 +1,8 @@
 /*************************************************************
 
-Copyright (c) 2025, Alicia Garrido Peña <alicia.garrido@uam.es>
+Copyright (c) 2025,
+Alicia Garrido Peña <alicia.garrido@uam.es>,
+Pablo Sanchez Martin <pablo.sanchezm@uam.es>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -155,6 +157,7 @@ int main(int argc, char **argv) {
     double accumulated_distance = 0.0;
 
     size_t n_steps = static_cast<size_t>(simulation_time / step);
+    
 
     // --- Simulation loop ---
     for (size_t i = 0; i < n_steps; ++i) {
@@ -169,11 +172,17 @@ int main(int argc, char **argv) {
                 try { csv_val = stod(cell); } catch (...) { csv_val = 0.0; }
             }
         }
+
+        // Precalculated values to scale the recorded PD to the HR
+        csv_val = 0.1711 * csv_val + 0.007208;
+
         // Overwrite dummy neuron
         HR_csv.set(HR::x, csv_val);
 
+        double h1_val = h1.get(HR::x)/1000;
         // Step synapse
-        s.step(step, HR_csv.get(HR::x), h1.get(HR::x));
+        s.step(step, HR_csv.get(HR::x), h1_val);
+
 
         // Apply synaptic input to HR1
         h1.add_synaptic_input(s.get(Synapsis::i));
@@ -181,7 +190,7 @@ int main(int argc, char **argv) {
         // Step HR1
         h1.step(step);
 
-        double h1_val = h1.get(HR::x);
+        
         double syn_val = s.get(Synapsis::ifast);
 
         // Update min/max
@@ -189,6 +198,7 @@ int main(int argc, char **argv) {
         h1_max = max(h1_max, h1_val);
         syn_min = min(syn_min, syn_val);
         syn_max = max(syn_max, syn_val);
+
 
         // Accumulate distance on-the-fly
         double h1_norm = (h1_val - h1_min) / (h1_max - h1_min + 1e-12);
@@ -203,8 +213,9 @@ int main(int argc, char **argv) {
             << s.get(Synapsis::ifast) << " "
             << s.get(Synapsis::islow)
             << "\n";
-    }
 
+    }
+    std::cout << "H1  min: " << h1_min  << " | H1  max: " << h1_max  << std::endl;
     csv.close();
 
     // --- Append distance to file ---

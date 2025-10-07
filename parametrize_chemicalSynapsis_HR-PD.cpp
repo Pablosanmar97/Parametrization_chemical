@@ -1,6 +1,8 @@
 /*************************************************************
 
-Copyright (c) 2025, Alicia Garrido Peña <alicia.garrido@uam.es>
+Copyright (c) 2025,
+Alicia Garrido Peña <alicia.garrido@uam.es>,
+Pablo Sanchez Martin <pablo.sanchezm@uam.es>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -173,8 +175,13 @@ int main(int argc, char **argv) {
         // Overwrite postsynaptic neuron with CSV value
         HR_csv.set(HR::x, csv_val);
 
+        double h1_val = h1.get(HR::x)/1000;
+        
+        // Precalculated values to scale the HR to the recorded PD
+        h1_val = 5.844 * h1_val - 0.04215;
+
         // Step synapse
-        s.step(step, h1.get(HR::x), HR_csv.get(HR::x));
+        s.step(step, h1_val, HR_csv.get(HR::x));
 
         // Apply synaptic input to postsynaptic neuron (optional, if you want to track input)
         HR_csv.add_synaptic_input(s.get(Synapsis::i));
@@ -182,7 +189,6 @@ int main(int argc, char **argv) {
         // Step presynaptic HR1 neuron
         h1.step(step);
 
-        double h1_val = h1.get(HR::x);
         double syn_val = s.get(Synapsis::ifast);
 
         // Update min/max

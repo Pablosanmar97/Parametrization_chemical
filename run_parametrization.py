@@ -9,10 +9,10 @@ exe_path = "./parametrize_chemicalSynapsis_PD-HR"
 yaml_folder = "yaml_configs"
 
 # Simulation parameters
-simulation_time = 1000.0  # adjust as needed
+simulation_time = 2000.0  # adjust as needed
 step = 0.01                # optional, adjust if needed
 
-csv_file = os.path.abspath("PDtraces.csv")
+csv_file = os.path.abspath("PDtracesV.csv")
 
 # Find all YAML files
 yaml_files = glob.glob(os.path.join(yaml_folder, "*.yaml"))
