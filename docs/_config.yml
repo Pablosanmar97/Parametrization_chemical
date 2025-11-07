@@ -1,7 +1,7 @@
 title: My Project Name
 description: Documentation for My Project
 remote_theme: just-the-docs/just-the-docs
-https://pablosanmar97.github.io/Parametrization_chemical
+url: https://pablosanmar97.github.io/Parametrization_chemical
 
 # Enable search (default: true)
 search_enabled: true
